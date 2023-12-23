@@ -27,24 +27,28 @@ embeddings = OpenAIEmbeddings()
 
 def create_db(embeddings):
 
-    file_path = "./data/sample.json"
+    file_path = "../data/sample.json"
     
     # loader = DirectoryLoader("./data", glob="./*.pdf", loader_cls=PyPDFLoader)
-
+    # loader = PyPDFLoader( file_path=file_path)
+        # text_content=False)
+    # if
+    # {
     loader = JSONLoader(
         file_path=file_path,
         jq_schema='.',
         text_content=False)
+# }
+    # else
+    # pdf_file = "/content/the-memoirs-of-sherlock-holmes-001-adventure-1-silver-blaze.pdf"
 
     documents = loader.load()
-    # pdf_file = "/content/the-memoirs-of-sherlock-holmes-001-adventure-1-silver-blaze.pdf"
-    # documents = loader.load()
 
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=100)
     docs = text_splitter.split_documents(documents)
 
-    db = FAISS.from_documents(docs, embeddings)
-    return db
+    vector_db = FAISS.from_documents(docs, embeddings)
+    return vector_db
 
 
 def get_response_from_query(db, query, model, depth=4):
@@ -75,23 +79,20 @@ def get_response_from_query(db, query, model, depth=4):
         [system_message_prompt, human_message_prompt]
     )
 
-    chain = LLMChain(llm=chat, prompt=chat_prompt)
+    chain = LLMChain(llm=model, prompt=chat_prompt)
 
     response = chain.run(question=query, context=docs_page_content)
     response = response.replace("\n", "")
     return response, docs
 
 with get_openai_callback() as cb:
-
     chat = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.2)
-
     db = create_db(embeddings)
 
-    
-    query = "Please specify the primary data center location/region of the underlying cloud infrastructure used to host the service(s) as well as the backup location(s)."
+    # query = "Please specify the primary data center location/region of the underlying cloud infrastructure used to host the service(s) as well as the backup location(s)."
+    query = "Does Company have a Network Diagram?"
     response, docs = get_response_from_query(db, query, chat)
     print(textwrap.fill(response, width=50))
-
 
     print('='*50+"token usage"+ "="*50)
     print(cb)
