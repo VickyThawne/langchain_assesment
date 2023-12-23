@@ -1,23 +1,18 @@
-from langchain.document_loaders import JSONLoader
 # from langchain.schema import StrOutputParser
 # from langchain_core.runnables import RunnablePassthrough
 from langchain.document_loaders import PyPDFLoader, JSONLoader
 from langchain.document_loaders import DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from file_processor import FileProcessor
+from models.file_processor import FileProcessor
 # import faiss
 from langchain.vectorstores import FAISS
+from langchain.document_loaders import PyPDFLoader
 
-class JsonFileProcessor(FileProcessor):
-    def document_loader(self, file_path):
-        try:
-            loader = JSONLoader(
-                file_path=file_path,
-                jq_schema='.',
-                text_content=False)
-            return loader.load()
-        except Exception as e:
-            print("Something went wrong while performing 'document_loader' operations", e)
+class PdfFileProcessor(FileProcessor):
+    def document_loader(self,file_path):
+        print("pdf file loader")
+        loader = PyPDFLoader( file_path=file_path)        # text_content=False)
+        return loader.load()
 
     def text_splitter(self,documents):
         try:
@@ -25,7 +20,6 @@ class JsonFileProcessor(FileProcessor):
             return text_splitter.split_documents(documents)
         except Exception as e:
             print("Something went wrong while performing 'text_splitter' operations", e)
-
 
     def prepare_vectordb(self,docs,embeddings):
         try:

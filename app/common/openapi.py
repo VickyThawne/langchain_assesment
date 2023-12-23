@@ -1,7 +1,8 @@
-
 from langchain.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain.chains import LLMChain
 # from langchain.chains import RetrievalQA
+
+
 
 def get_response_from_query(db, query, model, depth=4):
     # retriever = db.as_retriever(search_kwargs={"k": depth})
@@ -18,7 +19,8 @@ def get_response_from_query(db, query, model, depth=4):
         If you feel like you don't have enough information to answer the question, say "I don't know".
 
     """
-
+# System behaviour bot : question answer bot
+#     human behaviour
     system_message_prompt = SystemMessagePromptTemplate.from_template(template)
 
     # Human question prompt

@@ -1,7 +1,9 @@
-from json_file_processor import JsonFileProcessor
-from openapi import get_response_from_query
+from models.json_file_processor import JsonFileProcessor
+from models.pdf_file_processor import PdfFileProcessor
+from common.openapi import get_response_from_query
 import textwrap
 import json
+import os
 
 def process_request(request,embeddings,chat):
     try:
@@ -9,18 +11,27 @@ def process_request(request,embeddings,chat):
         if doc_file_path is None or question_file_path is None:
             return "Internal Server Error"
 
-        json_llm = JsonFileProcessor()
-        documents = json_llm.document_loader(doc_file_path)
+        if doc_file_path.endswith('.pdf'):
+            llm = PdfFileProcessor()
+        elif doc_file_path.endswith('.json'):
+            llm = JsonFileProcessor()
+        else:
+            raise Exception("Unsupported file system")
+
+
+        # json_llm = JsonFileProcessor()
+        documents = llm.document_loader(doc_file_path)
         if documents is None:
             return "Internal Server Error"
 
-        docs = json_llm.text_splitter(documents)
+        docs = llm.text_splitter(documents)
         if docs is None:
             return "Internal Server Error"
 
-        db = json_llm.prepare_vectordb(docs,embeddings)
+        db = llm.prepare_vectordb(docs,embeddings)
         if db is None:
             return "Internal Server Error"
+
 
         dict = {}
         with open(question_file_path) as data_file:
@@ -28,8 +39,8 @@ def process_request(request,embeddings,chat):
             for item in data:
                 query = item["question"]
                 response, docs = get_response_from_query(db, query, chat)
-                curated_response = textwrap.fill(response, width=50)
-                dict[item["question"]] = curated_response
+                # curated_response = textwrap.fill(response, width=50)
+                dict[item["question"]] = response
         return dict
     except Exception as e:
         print("Something went wrong while performing 'Document Loader' operations", e)
@@ -39,7 +50,7 @@ def prepare_file_path(request):
     try:
         doc_file = request.files['doc_file']
         question_file = request.files['question_file']
-        base_path = '/home/archit/Documents/workspace/langchain_assesment/app/data/uploads/'
+        base_path = os.path.dirname(os.path.realpath(__file__))+'/../data/uploads/'
         doc_file_path = base_path + doc_file.filename
         question_file_path = base_path + question_file.filename
         # Save the files to a specific location
