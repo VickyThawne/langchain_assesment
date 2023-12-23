@@ -1,10 +1,12 @@
 # Importing flask module in the project is mandatory
 # An object of Flask class is our WSGI application.
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Blueprint
 from dotenv import load_dotenv
 from llm_service import process_request
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
+
+# app_views = Blueprint('views', __name__)
 
 load_dotenv()
 
@@ -21,12 +23,14 @@ app = Flask(__name__)
 # which tells the application which URL should call
 # the associated function.
 @app.route('/')
+# @app_views.route('/')
 # ‘/’ URL is bound with hello_world() function.
 def hello_world():
     return 'Hello World'
 
 
 @app.route('/upload', methods=['POST'])
+# @app_views.route('/upload', methods=['POST'])
 def upload_files():
     try:
         # Check if the POST request has file parts

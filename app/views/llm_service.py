@@ -39,7 +39,7 @@ def prepare_file_path(request):
     try:
         doc_file = request.files['doc_file']
         question_file = request.files['question_file']
-        base_path = '/app/data/uploads/'
+        base_path = '/home/archit/Documents/workspace/langchain_assesment/app/data/uploads/'
         doc_file_path = base_path + doc_file.filename
         question_file_path = base_path + question_file.filename
         # Save the files to a specific location

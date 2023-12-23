@@ -12,3 +12,15 @@
 #
 # if __name__ == '__main__':
 #     app.run(debug=True, use_reloader=True)
+
+#
+# from flask import Flask
+# from views import app_views  # Import the views module
+#
+# app = Flask(__name__)
+#
+# # Register the blueprint defined in views.py
+# app.register_blueprint(app_views)
+#
+# if __name__ == '__main__':
+#     app.run(debug=True, use_reloader=True)
